@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"govue/helpers"
 	"govue/user"
 	"net/http"
@@ -109,4 +110,44 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 
 	response := helpers.APIresponse(metaMessage, http.StatusOK, "Success", data)
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *userHandler) UploadAvatar(c *gin.Context) {
+	//mendefinisikan user
+
+	file, err := c.FormFile("avatar")
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helpers.APIresponse("Failed to Upload Avatar File!", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	userID := 1
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helpers.APIresponse("Failed to Upload Avatar File!", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	_, err = h.userService.SaveAvatar(userID, path)
+
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		response := helpers.APIresponse("Failed to Upload Avatar File!", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	data := gin.H{"is_uploaded": true}
+	response := helpers.APIresponse("Avatar Upload Success", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
+	return
+
 }
