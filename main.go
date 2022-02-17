@@ -1,6 +1,7 @@
 package main
 
 import (
+	"govue/auth"
 	"govue/handler"
 	"govue/user"
 	"log"
@@ -21,7 +22,9 @@ func main() {
 	userRepo := user.NewRepository(db)
 	userService := user.NewService(*userRepo)
 
-	userHandler := handler.NewHandler(userService)
+	authService := auth.NewService()
+
+	userHandler := handler.NewHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
