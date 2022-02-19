@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"govue/auth"
+	"govue/campaign"
 	"govue/handler"
 	"govue/helpers"
 	"govue/user"
@@ -24,6 +26,22 @@ func main() {
 	}
 
 	userRepo := user.NewRepository(db)
+	campaignRepo := campaign.NewRepository(db)
+
+	campaigns, err := campaignRepo.FindByUserID(1)
+
+	fmt.Println("Debug")
+	fmt.Println("Debug")
+	fmt.Println("Debug")
+	fmt.Println(len(campaigns))
+
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImages) > 0 {
+			fmt.Println(campaign.CampaignImages[0].FileName)
+		}
+	}
+
 	userService := user.NewService(*userRepo)
 
 	authService := auth.NewService()
