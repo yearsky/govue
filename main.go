@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"govue/auth"
 	"govue/campaign"
 	"govue/handler"
@@ -31,12 +30,13 @@ func main() {
 	userService := user.NewService(*userRepo)
 	campaignService := campaign.NewService(campaignRepo)
 
-	campaigns, _ := campaignService.FindCampaigns(2)
-	fmt.Println(len(campaigns))
+	// campaigns, _ := campaignService.GetCampaigns(2)
+	// fmt.Println(len(campaigns))
 
 	authService := auth.NewService()
 
 	userHandler := handler.NewHandler(userService, authService)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")
@@ -45,6 +45,8 @@ func main() {
 	api.POST("/sessions", userHandler.LoginUser)
 	api.POST("/email_checkers", userHandler.CheckEmailAvailability)
 	api.POST("/upload_avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	api.GET("/campaigns", campaignHandler.GetCampaigns)
 
 	router.Run()
 
